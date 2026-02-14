@@ -54,6 +54,10 @@ options = [
     "--onefile",                    # Un solo archivo ejecutable
     "--windowed",                   # Sin ventana de consola
     "--clean",                      # Limpiar caché antes de compilar
+    "--paths=.",
+    f"--add-data=config.py{os.pathsep}.",
+    f"--add-data=software_manager.py{os.pathsep}.",
+    f"--add-data=utils.py{os.pathsep}.",
     "--hidden-import=config",
     "--hidden-import=software_manager",
     "--hidden-import=utils",
@@ -64,6 +68,16 @@ options = [
     "--hidden-import=glob",
     "--hidden-import=ssl",
     "--hidden-import=webbrowser",
+    "--hidden-import=contextlib",
+    "--hidden-import=urllib",
+    "--hidden-import=urllib.request",
+    "--hidden-import=urllib.error",
+    "--hidden-import=shutil",
+    "--hidden-import=pathlib",
+    "--hidden-import=subprocess",
+    "--hidden-import=time",
+    "--hidden-import=threading",
+    "--collect-submodules=PIL",
 ]
 
 # Incluir recursos visuales si están disponibles (modo portable).

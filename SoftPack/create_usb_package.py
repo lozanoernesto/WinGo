@@ -89,7 +89,10 @@ def build(mode='onefile', name='SoftPack', icon=None, additional_data=None):
         for item in additional_data:
             args.append(f"--add-data={item}")
 
-    # Añadir hidden-imports para módulos del proyecto y PIL (Pillow)
+    # Asegurar que PyInstaller busque módulos locales en el directorio actual
+    args.append("--paths=.")
+
+    # Añadir hidden-imports para módulos del proyecto y sus dependencias
     hidden = [
         "--hidden-import=config",
         "--hidden-import=software_manager",
@@ -101,6 +104,16 @@ def build(mode='onefile', name='SoftPack', icon=None, additional_data=None):
         "--hidden-import=glob",
         "--hidden-import=ssl",
         "--hidden-import=webbrowser",
+        "--hidden-import=contextlib",
+        "--hidden-import=urllib",
+        "--hidden-import=urllib.request",
+        "--hidden-import=urllib.error",
+        "--hidden-import=shutil",
+        "--hidden-import=pathlib",
+        "--hidden-import=subprocess",
+        "--hidden-import=time",
+        "--hidden-import=threading",
+        "--collect-submodules=PIL",
     ]
     args.extend(hidden)
 
@@ -205,9 +218,12 @@ def main(argv=None):
         if len(str(target)) == 2 and str(target).endswith(':'):
             target = Path(str(target) + '\\')
 
-    # Solo recursos no-Python como add-data. Los módulos .py se descubren
-    # automáticamente por PyInstaller via --hidden-import.
-    add_data = []
+    # Módulos locales como add-data + recursos visuales.
+    add_data = [
+        f"config.py{os.pathsep}.",
+        f"software_manager.py{os.pathsep}.",
+        f"utils.py{os.pathsep}.",
+    ]
     icons_dir = Path("icons")
     if icons_dir.exists() and icons_dir.is_dir():
         add_data.append(f"icons{os.pathsep}icons")

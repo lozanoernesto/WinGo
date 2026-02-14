@@ -32,6 +32,10 @@ jobs:
           --windowed
           --clean
           --noconfirm
+          --paths=.
+          --add-data "config.py;."
+          --add-data "software_manager.py;."
+          --add-data "utils.py;."
           --add-data "icons;icons"
           --hidden-import=config
           --hidden-import=software_manager
@@ -43,6 +47,17 @@ jobs:
           --hidden-import=glob
           --hidden-import=ssl
           --hidden-import=webbrowser
+          --hidden-import=contextlib
+          --hidden-import=urllib
+          --hidden-import=urllib.request
+          --hidden-import=urllib.error
+          --hidden-import=shutil
+          --hidden-import=pathlib
+          --hidden-import=subprocess
+          --hidden-import=time
+          --hidden-import=threading
+          --hidden-import=winreg
+          --collect-submodules=PIL
           main.py
 
       - name: Verificar que se creó el .exe

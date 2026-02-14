@@ -5,12 +5,25 @@ WinGo - Gestor de Instalación de Software (Rediseñado)
 Interfaz moderna con tarjetas/tiles para cada programa
 """
 
+import sys
+import os
+
+# --- PyInstaller runtime path fix ---
+# Cuando se ejecuta como .exe empaquetado, los módulos locales (config.py,
+# software_manager.py, utils.py) se extraen a un directorio temporal.
+# Asegurar que ese directorio esté al inicio de sys.path para que los
+# imports funcionen correctamente.
+if getattr(sys, 'frozen', False):
+    _bundle_dir = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+    if _bundle_dir not in sys.path:
+        sys.path.insert(0, _bundle_dir)
+# --- Fin fix ---
+
 import tkinter as tk
 from tkinter import ttk, messagebox, scrolledtext
 import threading
 from software_manager import SoftwareManager
 from config import SOFTWARE_CATALOG, APP_CONFIG
-import os
 from pathlib import Path
 from PIL import Image, ImageTk
 
