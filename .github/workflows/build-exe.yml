@@ -1,0 +1,95 @@
+name: Build WinGo USB Package
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v4
+
+      - name: Instalar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pillow
+
+      - name: Compilar SoftPack.exe (onefile portable)
+        working-directory: SoftPack
+        run: |
+          pyinstaller ^
+            --name=SoftPack ^
+            --onefile ^
+            --windowed ^
+            --clean ^
+            --noconfirm ^
+            --add-data "config.py;." ^
+            --add-data "software_manager.py;." ^
+            --add-data "utils.py;." ^
+            --hidden-import=PIL ^
+            --hidden-import=PIL.Image ^
+            --hidden-import=PIL.ImageTk ^
+            --hidden-import=PIL.ImageFont ^
+            main.py
+
+      - name: Verificar que se creó el .exe
+        working-directory: SoftPack
+        run: |
+          if (Test-Path "dist\SoftPack.exe") {
+            Write-Host "SoftPack.exe creado correctamente"
+            Get-Item "dist\SoftPack.exe" | Select-Object Name, Length
+          } else {
+            Write-Host "ERROR: SoftPack.exe no se creó"
+            exit 1
+          }
+        shell: pwsh
+
+      - name: Crear lanzador portable (run_softpack.bat)
+        working-directory: SoftPack/dist
+        run: |
+          @echo off > run_softpack.bat
+          echo @echo off > run_softpack.bat
+          echo setlocal >> run_softpack.bat
+          echo. >> run_softpack.bat
+          echo REM WinGo - Lanzador ultra portable para USB >> run_softpack.bat
+          echo cd /d %%~dp0 >> run_softpack.bat
+          echo set "SOFTPACK_PORTABLE_ROOT=%%~dp0SoftPackData" >> run_softpack.bat
+          echo if not exist "%%SOFTPACK_PORTABLE_ROOT%%" mkdir "%%SOFTPACK_PORTABLE_ROOT%%" >> run_softpack.bat
+          echo if not exist "%%SOFTPACK_PORTABLE_ROOT%%\Downloads" mkdir "%%SOFTPACK_PORTABLE_ROOT%%\Downloads" >> run_softpack.bat
+          echo if not exist "%%SOFTPACK_PORTABLE_ROOT%%\Temp" mkdir "%%SOFTPACK_PORTABLE_ROOT%%\Temp" >> run_softpack.bat
+          echo start "" "%%~dp0SoftPack.exe" >> run_softpack.bat
+          echo endlocal >> run_softpack.bat
+        shell: cmd
+
+      - name: Crear README para USB
+        working-directory: SoftPack/dist
+        run: |
+          $content = @"
+          WinGo - Ejecucion desde USB
+
+          Para ejecutar: doble clic en run_softpack.bat o en SoftPack.exe
+          Las descargas se guardan en SoftPackData\Downloads (dentro de la USB)
+          Los temporales se limpian automaticamente al cerrar la app.
+
+          Si el antivirus bloquea la ejecucion, permite SoftPack en tu antivirus.
+          "@
+          $content | Out-File -FilePath "LEEME.txt" -Encoding utf8
+        shell: pwsh
+
+      - name: Subir paquete USB como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: WinGo-USB-Portable
+          path: |
+            SoftPack/dist/SoftPack.exe
+            SoftPack/dist/run_softpack.bat
+            SoftPack/dist/LEEME.txt
+          retention-days: 90
