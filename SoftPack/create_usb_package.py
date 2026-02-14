@@ -89,8 +89,19 @@ def build(mode='onefile', name='SoftPack', icon=None, additional_data=None):
         for item in additional_data:
             args.append(f"--add-data={item}")
 
-    # Añadir hidden-imports para PIL (Pillow)
-    hidden = ["--hidden-import=PIL", "--hidden-import=PIL.Image", "--hidden-import=PIL.ImageTk", "--hidden-import=PIL.ImageFont"]
+    # Añadir hidden-imports para módulos del proyecto y PIL (Pillow)
+    hidden = [
+        "--hidden-import=config",
+        "--hidden-import=software_manager",
+        "--hidden-import=utils",
+        "--hidden-import=PIL",
+        "--hidden-import=PIL.Image",
+        "--hidden-import=PIL.ImageTk",
+        "--hidden-import=PIL.ImageFont",
+        "--hidden-import=glob",
+        "--hidden-import=ssl",
+        "--hidden-import=webbrowser",
+    ]
     args.extend(hidden)
 
     args.append("main.py")
@@ -194,13 +205,9 @@ def main(argv=None):
         if len(str(target)) == 2 and str(target).endswith(':'):
             target = Path(str(target) + '\\')
 
-    # Preparar opciones de add-data locales.
-    # Incluimos recursos no-Python necesarios para que el .exe sea portátil.
-    add_data = [
-        f"config.py{os.pathsep}.",
-        f"software_manager.py{os.pathsep}.",
-        f"utils.py{os.pathsep}.",
-    ]
+    # Solo recursos no-Python como add-data. Los módulos .py se descubren
+    # automáticamente por PyInstaller via --hidden-import.
+    add_data = []
     icons_dir = Path("icons")
     if icons_dir.exists() and icons_dir.is_dir():
         add_data.append(f"icons{os.pathsep}icons")

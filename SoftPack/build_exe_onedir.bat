@@ -62,9 +62,16 @@ pyinstaller --name=SoftPack ^
     --windowed ^
     --clean ^
     --noconfirm ^
+    --hidden-import=config ^
+    --hidden-import=software_manager ^
+    --hidden-import=utils ^
     --hidden-import=PIL ^
     --hidden-import=PIL.Image ^
     --hidden-import=PIL.ImageTk ^
+    --hidden-import=PIL.ImageFont ^
+    --hidden-import=glob ^
+    --hidden-import=ssl ^
+    --hidden-import=webbrowser ^
     main.py
 
 if errorlevel 1 (

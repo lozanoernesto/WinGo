@@ -54,13 +54,16 @@ options = [
     "--onefile",                    # Un solo archivo ejecutable
     "--windowed",                   # Sin ventana de consola
     "--clean",                      # Limpiar caché antes de compilar
-    f"--add-data=config.py{os.pathsep}.",
-    f"--add-data=software_manager.py{os.pathsep}.",
-    f"--add-data=utils.py{os.pathsep}.",
+    "--hidden-import=config",
+    "--hidden-import=software_manager",
+    "--hidden-import=utils",
     "--hidden-import=PIL",
     "--hidden-import=PIL.Image",
     "--hidden-import=PIL.ImageTk",
     "--hidden-import=PIL.ImageFont",
+    "--hidden-import=glob",
+    "--hidden-import=ssl",
+    "--hidden-import=webbrowser",
 ]
 
 # Incluir recursos visuales si están disponibles (modo portable).
